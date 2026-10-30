@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "wfo.media",
+  "name": "Music",
+  "version": "1.0.0",
+  "author": "wfo",
+  "description": "A themed music button with album art and playback controls",
+  "kinds": [
+    "service",
+    "bar-widget"
+  ],
+  "keepLoaded": true,
+  "entryPoints": {
+    "service": "Service.qml",
+    "barWidget": "MusicWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Music",
+    "description": "Click for album art, track details and playback controls",
+    "category": "Media",
+    "allowMultiple": false,
+    "defaultSection": "center"
+  },
+  "omarchy": {
+    "clonedFrom": "omarchy.media"
+  }
+}
