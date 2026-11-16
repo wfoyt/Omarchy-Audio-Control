@@ -50,15 +50,33 @@ The root manifest registers `wfo.media`, a clone of the built-in `omarchy.media`
 - Select a player from the source picker when multiple players are available.
 - When artwork is missing, a music note takes its place. Unavailable controls are dimmed.
 
-## Update, disable, or remove
+## Update or disable
+
+To update the plugin:
 
 ```bash
 omarchy plugin update wfo.media
+```
+
+To disable it without removing its files:
+
+```bash
 omarchy plugin disable wfo.media
+```
+
+## Removal
+
+To uninstall the plugin, run the following command and confirm the prompt:
+
+```bash
 omarchy plugin remove wfo.media
 ```
 
-Removing the plugin removes its installed files. Re-enable the built-in media plugin with `omarchy plugin enable omarchy.media` if needed.
+For a Git-installed plugin, this deletes its installed directory. If the plugin was enabled, Omarchy restores the built-in media plugin. If needed, you can enable it manually:
+
+```bash
+omarchy plugin enable omarchy.media
+```
 
 ## Development
 
