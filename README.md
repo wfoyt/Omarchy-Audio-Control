@@ -1,50 +1,64 @@
+<div align="center">
+
 # Omarchy Audio Control
 
-A themed music button for the Omarchy Quickshell bar. Click to show album
-art, track name, artist, album, and previous/restart, play/pause, and skip controls.
-Uses Omarchy’s native colors, typography, spacing, borders, and popup behavior.
+**A minimal music button for the Omarchy bar.**
 
-## Install
+Album art, track details, and playback controls, right where you need them.
 
-Requires an Omarchy version with the Quickshell shell and `omarchy plugin` commands.
+[Install](#installation) · [Features](#features) · [Usage](#usage) · [Development](#development)
+
+</div>
+
+![The music button and now-playing popup in Omarchy](docs/images/music-player.png)
+
+Omarchy Audio Control keeps your bar uncluttered: a single music-note button opens a compact player when you need it. The popup follows Omarchy's native colors, typography, spacing, borders, and behavior, so it feels at home with your theme.
+
+## Features
+
+- **Minimal by design** — one small bar button, with controls tucked into a popup.
+- **Now playing** — see album art, track name, artist, and album at a glance.
+- **Playback controls** — play or pause, skip forward, and go back or restart a track.
+- **Multiple players** — choose a source when more than one player is available.
+- **Native integration** — retains Omarchy's media hotkeys and player detection.
+
+*The popup follows your Omarchy theme; available controls depend on your player.*
+
+## Installation
+
+You need an Omarchy version with the Quickshell shell and `omarchy plugin` commands. Your player must expose MPRIS metadata and controls, as Spotify and many Linux media players do. No additional packages or install scripts are required.
 
 ```bash
 omarchy plugin add https://github.com/wfoyt/Omarchy-Audio-Control.git --enable
 ```
 
-Choose the center section when prompted. To place the button immediately
-right of weather:
+Choose your preferred bar section when prompted.
 
-```bash
-omarchy bar move wfo.media --after omarchy.weather
-```
+The root manifest registers `wfo.media`, a clone of the built-in `omarchy.media` service. Enabling it replaces the stock media plugin while preserving Omarchy's media hotkeys and player detection.
 
-The root manifest registers `wfo.media`, a clone of the built-in
-`omarchy.media` service. Enabling it replaces the stock media plugin and
-preserves Omarchy’s media hotkeys and player detection. No install scripts
-or additional packages are required. Your player must expose MPRIS metadata
-and controls, as Spotify and many Linux media players do.
+> **Already have a local `wfo.media` plugin?** Move its folder outside `~/.config/omarchy/plugins/` before installing. The installer refuses duplicate plugin IDs; keep the old folder as a backup.
 
-If you already have the locally created `wfo.media` plugin, move that folder
-outside `~/.config/omarchy/plugins/` before installing this repository; the
-installer correctly refuses duplicate plugin IDs. Keep it as a backup.
+## Usage
 
-## Use
+![Music player showing album art, track details, and playback controls](docs/images/now-playing.png)
 
-- Click the music-note button to open or close the popup.
-- Previous/restart restarts after three seconds; near the beginning it goes
-  to the previous track. Players without seeking use their native Previous action.
-- Play/pause and Next control the displayed player.
-- Click outside or press Escape to dismiss.
-- Multiple available players appear in a source picker.
-- Missing artwork shows a music note; unavailable controls are dimmed.
+*Your music at a glance, with playback controls just below.*
 
-## Update or disable
+- Click the music-note button to open or close the popup. Click outside it or press **Escape** to dismiss it.
+- Use **Previous / restart** to restart a track after three seconds, or go to the previous track near the beginning. Players without seeking use their native Previous action.
+- Use **Play / pause** and **Next** to control the displayed player.
+- Select a player from the source picker when multiple players are available.
+- When artwork is missing, a music note takes its place. Unavailable controls are dimmed.
+
+## Update, disable, or remove
 
 ```bash
 omarchy plugin update wfo.media
 omarchy plugin disable wfo.media
+omarchy plugin remove wfo.media
 ```
+
+Removing the plugin removes its installed files. Re-enable the built-in media plugin with `omarchy plugin enable omarchy.media` if needed.
 
 ## Development
 
@@ -53,11 +67,10 @@ omarchy plugin validate .
 qmllint MusicWidget.qml Playback.js
 ```
 
-`MusicWidget.qml` implements the native button and popup. `Playback.js`
-implements previous/restart. `Service.qml` and `MediaModel.js` are derived
-from Omarchy’s media plugin (https://github.com/basecamp/omarchy), preserving
-its source selection and playback integration. The `omarchy.clonedFrom`
-manifest field retains the required service compatibility.
+`MusicWidget.qml` implements the button and popup; `Playback.js` implements previous/restart. `Service.qml` and `MediaModel.js` are derived from [Omarchy's media plugin](https://github.com/basecamp/omarchy), preserving its source selection and playback integration. The `omarchy.clonedFrom` manifest field retains the required service compatibility.
 
-Plugin metadata and entry points are at the repository root so Omarchy’s
-standard Git installer can validate and load the checkout directly.
+Plugin metadata and entry points are at the repository root so Omarchy's standard Git installer can validate and load the checkout directly.
+
+## License
+
+MIT. See [LICENSE](LICENSE). The media service and model include code derived from Omarchy, copyright David Heinemeier Hansson.
