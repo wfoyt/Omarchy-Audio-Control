@@ -48,7 +48,7 @@ The root manifest registers `wfo.media`, a clone of the built-in `omarchy.media`
 - Use **Previous / restart** to restart a track after three seconds, or go to the previous track near the beginning. Players without seeking use their native Previous action.
 - Use **Play / pause** and **Next** to control the displayed player.
 - Select a player from the source picker when multiple players are available.
-- When artwork is missing, a music note takes its place. Unavailable controls are dimmed.
+- Artwork is loaded only from local `file:///` URLs without a host. Remote artwork URLs are never fetched by the shell. When artwork is missing, remote, or cannot be loaded, a music note takes its place. Unavailable controls are dimmed.
 
 ## Update or disable
 
@@ -82,7 +82,9 @@ omarchy plugin enable omarchy.media
 
 ```bash
 omarchy plugin validate .
-qmllint MusicWidget.qml Playback.js
+qmllint MusicWidget.qml Playback.js Artwork.js
+node --test tests/artwork.test.js
+QT_QPA_PLATFORM=offscreen qmltestrunner -input tests
 ```
 
 `MusicWidget.qml` implements the button and popup; `Playback.js` implements previous/restart. `Service.qml` and `MediaModel.js` are derived from [Omarchy's media plugin](https://github.com/basecamp/omarchy), preserving its source selection and playback integration. The `omarchy.clonedFrom` manifest field retains the required service compatibility.

@@ -4,6 +4,7 @@ import qs.Ui
 import qs.Commons
 import qs.Commons as Commons
 import "Playback.js" as Playback
+import "Artwork.js" as Artwork
 
 Panel {
   id: root
@@ -70,7 +71,7 @@ Panel {
             anchors.margins: Style.space(2)
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
-            source: root.activePlayer && root.activePlayer.trackArtUrl ? root.activePlayer.trackArtUrl : ""
+            source: Artwork.localSource(root.activePlayer ? root.activePlayer.trackArtUrl : "")
             visible: status === Image.Ready
           }
 
