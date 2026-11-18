@@ -12,9 +12,11 @@ Item {
 
   function refresh() {
     source = ""
+    requestedUrl = ""
     discarded = true
+    debounce.stop()
     if (reader.running) reader.signal(9)
-    debounce.restart()
+    else if (Artwork.localSource(url)) debounce.restart()
   }
   onUrlChanged: refresh()
   Component.onCompleted: refresh()
@@ -53,7 +55,7 @@ Item {
     onExited: function(exitCode, exitStatus) {
       deadline.stop()
       if (exitCode !== 0) root.source = ""
-      if (root.requestedUrl !== root.url) debounce.restart()
+      if (root.requestedUrl !== root.url && Artwork.localSource(root.url)) debounce.restart()
     }
   }
 }

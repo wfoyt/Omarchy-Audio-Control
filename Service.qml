@@ -10,6 +10,7 @@ Item {
 
   property var shell: null
   property string preferredPlayerKey: ""
+  property string selectedPlayerKey: ""
   property var playerStartedAt: ({})
   property var pendingTrackOsd: null
   property int playSerial: 0
@@ -27,7 +28,7 @@ Item {
   readonly property var sourcePlayers: orderedSourcePlayers()
   readonly property var sourceCyclePlayers: orderedCycleSourcePlayers()
   readonly property var activePlayer: selectActivePlayer()
-  readonly property bool hasMedia: activePlayer !== null && (activePlayer.trackTitle || activePlayer.trackArtist)
+  readonly property bool hasMedia: !!(activePlayer && (activePlayer.trackTitle || activePlayer.trackArtist))
   readonly property string title: activePlayer ? (activePlayer.trackTitle || "") : ""
   readonly property string artist: activePlayer ? (activePlayer.trackArtist || "") : ""
   readonly property string album: activePlayer && activePlayer.trackAlbum ? activePlayer.trackAlbum : ""
@@ -124,6 +125,8 @@ Item {
 
     if (preferredPlayerKey && !alive[preferredPlayerKey]) preferredPlayerKey = ""
 
+    if (selectedPlayerKey && !alive[selectedPlayerKey]) selectedPlayerKey = ""
+
     playSerial = serial
     playerStartedAt = next
   }
@@ -163,7 +166,7 @@ Item {
     return list
   }
 
-  function oldestPlayingPlayer(requirePlaybackStream) {
+  function oldestPlayingPlayer(requirePlaybackStream, action) {
     var oldest = null
     var oldestOrder = 0
     var playingProxy = null
@@ -174,7 +177,7 @@ Item {
       if (!p) continue
 
       var proxyPlayer = isProxyPlayer(p)
-      if (p.isPlaying) {
+      if (p.isPlaying && (!action || canHandleAction(p, action))) {
         if (requirePlaybackStream && !playerHasPlaybackStream(p)) continue
 
         var order = playerOrder(p, i + 1000)
@@ -208,6 +211,7 @@ Item {
 
       var proxy = isProxyPlayer(p)
 
+      if (selectedPlayerKey && playerKey(p) === selectedPlayerKey && hasMetadata(p)) return p
       if (preferredPlayerKey && playerKey(p) === preferredPlayerKey && hasMetadata(p)) preferred = p
 
       if (playerHasPlaybackStream(p)) {
@@ -287,7 +291,8 @@ Item {
   function selectPlayer(key) {
     var player = playerForKey(key)
     if (!player || !hasMetadata(player)) return false
-    preferredPlayerKey = playerKey(player)
+    selectedPlayerKey = playerKey(player)
+    preferredPlayerKey = selectedPlayerKey
     return true
   }
 
@@ -318,7 +323,7 @@ Item {
     if (!list || list.length === 0) return false
 
     var activeKey = playerKey(activePlayer)
-    var index = 0
+    var index = delta > 0 ? -1 : 0
     for (var i = 0; i < list.length; i++) {
       if (playerKey(list[i]) === activeKey) {
         index = i
@@ -333,6 +338,7 @@ Item {
     var currentKey = playerKey(current)
     var nextKey = playerKey(next)
 
+    selectedPlayerKey = nextKey
     preferredPlayerKey = nextKey
 
     if (transferPlayback && currentWasPlaying && next && nextKey !== currentKey) {
@@ -349,11 +355,10 @@ Item {
   }
 
   function playerForAction(action, targetKey) {
-    var targeted = playerForKey(targetKey)
-    if (targeted) return targeted
+    if (targetKey) return playerForKey(targetKey)
 
     if (action === "pause" || action === "playPause") {
-      var oldest = oldestPlayingPlayer(true) || oldestPlayingPlayer(false)
+      var oldest = oldestPlayingPlayer(true, action) || oldestPlayingPlayer(false, action)
       if (oldest) return oldest
     }
 
@@ -424,7 +429,10 @@ Item {
       }
     }
 
-    if (handled && key) preferredPlayerKey = key
+    if (handled && key) {
+      if (key !== selectedPlayerKey) selectedPlayerKey = ""
+      preferredPlayerKey = key
+    }
     if (showFeedback !== false)
       scheduleOsd(actionLabel, iconName, player, handled && (action === "next" || action === "previous"), beforeTrackSignature)
     return handled

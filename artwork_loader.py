@@ -16,7 +16,7 @@ def local_path(url):
     if len(url) > 16384 or re.search(r'[\\\x00-\x1f\x7f]', url):
         raise ValueError('Invalid URL')
     parts = urlsplit(url)
-    if parts.scheme.lower() != 'file' or parts.netloc or parts.query or parts.fragment:
+    if parts.scheme.lower() != 'file' or parts.netloc or '?' in url or '#' in url:
         raise ValueError('Not a hostless file URL')
     if not url.lower().startswith('file:///'):
         raise ValueError('Not an absolute file URL')

@@ -30,3 +30,17 @@ test('OSD metadata cannot become rich text', () => {
   assert.equal(Media.safeDisplayText('Normal title - Artist'), 'Normal title - Artist')
   assert.equal(Media.safeDisplayText('x'.repeat(10000)).length, 4096)
 })
+
+test('playback capability follows the current playback state', () => {
+  const player = { isPlaying: true, canPlay: true }
+  assert.equal(Media.canHandleAction(player, 'playPause'), false)
+  player.isPlaying = false
+  assert.equal(Media.canHandleAction(player, 'playPause'), true)
+
+  const toggleOnly = { canTogglePlaying: true, isPlaying: false }
+  assert.equal(Media.canHandleAction(toggleOnly, 'play'), true)
+  assert.equal(Media.canHandleAction(toggleOnly, 'pause'), false)
+  toggleOnly.isPlaying = true
+  assert.equal(Media.canHandleAction(toggleOnly, 'play'), false)
+  assert.equal(Media.canHandleAction(toggleOnly, 'pause'), true)
+})

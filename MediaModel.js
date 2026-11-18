@@ -20,9 +20,9 @@ function canHandleAction(player, action) {
   if (!player) return false
   if (action === "next") return !!player.canGoNext
   if (action === "previous") return !!player.canGoPrevious
-  if (action === "play") return !!(player.canPlay || player.canTogglePlaying)
-  if (action === "pause") return !!(player.canPause || player.canTogglePlaying)
-  if (action === "playPause") return !!(player.canTogglePlaying || player.canPlay || player.canPause)
+  if (action === "play") return !!(player.canPlay || (!player.isPlaying && player.canTogglePlaying))
+  if (action === "pause") return !!(player.canPause || (player.isPlaying && player.canTogglePlaying))
+  if (action === "playPause") return !!(player.canTogglePlaying || (player.isPlaying ? player.canPause : player.canPlay))
   return false
 }
 

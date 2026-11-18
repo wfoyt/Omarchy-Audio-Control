@@ -26,7 +26,7 @@ Panel {
 
   Artwork {
     id: artwork
-    url: root.activePlayer ? root.activePlayer.trackArtUrl : ""
+    url: root.opened && root.activePlayer ? (root.activePlayer.trackArtUrl || "") : ""
   }
 
   implicitWidth: button.implicitWidth
@@ -100,22 +100,26 @@ Panel {
 
           Text {
             textFormat: Text.PlainText
-            text: root.title
+            text: root.title.slice(0, 4096)
             color: root.detailColor
             font.family: Style.font.family
             font.pixelSize: Style.font.subtitle
             font.bold: true
+            maximumLineCount: 3
+            elide: Text.ElideRight
             wrapMode: Text.Wrap
             width: parent.width
           }
 
           Text {
             textFormat: Text.PlainText
-            text: root.artist
+            text: root.artist.slice(0, 4096)
             color: root.detailColor
             opacity: 0.75
             font.family: Style.font.family
             font.pixelSize: Style.font.bodySmall
+            maximumLineCount: 3
+            elide: Text.ElideRight
             wrapMode: Text.Wrap
             width: parent.width
             visible: text !== ""
@@ -123,7 +127,7 @@ Panel {
 
           Text {
             textFormat: Text.PlainText
-            text: root.activePlayer && root.activePlayer.trackAlbum ? root.activePlayer.trackAlbum : ""
+            text: root.activePlayer && root.activePlayer.trackAlbum ? root.activePlayer.trackAlbum.slice(0, 4096) : ""
             color: root.detailColor
             opacity: 0.6
             font.family: Style.font.family
@@ -237,7 +241,7 @@ Panel {
 
                 Text {
                   textFormat: Text.PlainText
-                  text: sourceRow.sourceTitle
+                  text: sourceRow.sourceTitle.slice(0, 4096)
                   color: root.detailColor
                   font.family: Style.font.family
                   font.pixelSize: Style.font.bodySmall
@@ -248,7 +252,7 @@ Panel {
 
                 Text {
                   textFormat: Text.PlainText
-                  text: sourceRow.sourceDetail
+                  text: sourceRow.sourceDetail.slice(0, 4096)
                   color: root.detailColor
                   opacity: 0.65
                   font.family: Style.font.family

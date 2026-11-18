@@ -31,18 +31,18 @@ ShellRoot {
           root.check(!service.playPlayer(null) && !service.pausePlayer(null), "missing-player guards")
           art.url = Qt.resolvedUrl("../../preview.png")
           root.step++
-        } else if (root.step === 1 && !art.loading) {
+        } else if (root.step === 1 && !art.loading && image.status !== Image.Loading) {
           root.check(image.status === Image.Ready, "local artwork not decoded")
           root.check(art.source.indexOf("data:image/png;base64,") === 0, "Qt received a file path")
           art.url = Qt.resolvedUrl("cover.jpg")
           root.step = 10
-        } else if (root.step === 10 && !art.loading) {
+        } else if (root.step === 10 && !art.loading && image.status !== Image.Loading) {
           root.check(image.status === Image.Ready, "JPEG artwork not decoded")
           root.check(art.source.indexOf("data:image/jpeg;base64,") === 0, "JPEG MIME invalid")
           art.url = Qt.resolvedUrl("pipe.png")
           unrelated.source = Qt.resolvedUrl("../../docs/images/now-playing.png")
           root.step = 2
-        } else if (root.step === 2 && !art.loading) {
+        } else if (root.step === 2 && !art.loading && unrelated.status !== Image.Loading) {
           root.check(image.status === Image.Null, "FIFO did not fall back")
           root.check(unrelated.status === Image.Ready, "other shell image was blocked")
           art.url = "file:///dev/zero"
@@ -51,7 +51,7 @@ ShellRoot {
           root.check(art.source === "", "device accepted")
           art.url = Qt.resolvedUrl("../../preview.png")
           root.step++
-        } else if (root.step === 4 && !art.loading) {
+        } else if (root.step === 4 && !art.loading && image.status !== Image.Loading) {
           root.check(image.status === Image.Ready, "did not recover from invalid artwork")
           art.url = "http://127.0.0.1:8765/private"
           root.check(art.source === "", "old artwork was not cleared")

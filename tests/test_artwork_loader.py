@@ -94,6 +94,11 @@ class ArtworkTests(unittest.TestCase):
             with self.subTest(url=url):
                 self.assertEqual(self.run_reader(url), b'')
 
+    def test_query_and_fragment_delimiters_on_existing_artwork(self):
+        for suffix in ('?', '#', '?x', '#x'):
+            with self.subTest(suffix=suffix):
+                self.assertEqual(self.run_reader(self.cover.as_uri() + suffix), b'')
+
     def test_dimensions_and_malformed_headers(self):
         png = self.cover.read_bytes()
         self.assertEqual(loader.image_type(png), 'image/png')
