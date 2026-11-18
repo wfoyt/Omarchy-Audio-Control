@@ -26,7 +26,7 @@ Omarchy Audio Control keeps your bar uncluttered: a single music-note button ope
 
 ## Installation
 
-You need an Omarchy version with the Quickshell shell and `omarchy plugin` commands. Your player must expose MPRIS metadata and controls, as Spotify and many Linux media players do. No additional packages or install scripts are required.
+You need an Omarchy version with the Quickshell shell and `omarchy plugin` commands. Your player must expose MPRIS metadata and controls, as Spotify and many Linux media players do. Artwork loading requires Python 3 (`python` on Arch); it uses only the standard library. No install scripts are required. If Python is unavailable, playback still works and artwork uses the fallback icon.
 
 ```bash
 omarchy plugin add https://github.com/wfoyt/Omarchy-Audio-Control.git --enable
@@ -48,7 +48,7 @@ The root manifest registers `wfo.media`, a clone of the built-in `omarchy.media`
 - Use **Previous / restart** to restart a track after three seconds, or go to the previous track near the beginning. Players without seeking use their native Previous action.
 - Use **Play / pause** and **Next** to control the displayed player.
 - Select a player from the source picker when multiple players are available.
-- Artwork is loaded only from local `file:///` URLs without a host. Remote artwork URLs are never fetched by the shell. When artwork is missing, remote, or cannot be loaded, a music note takes its place. Unavailable controls are dimmed.
+- Artwork supports local PNG and JPEG files via hostless `file:///` URLs. A helper validates the opened inode as a regular file and caps accepted artwork at 8 MiB, with a three-second deadline. Image dimensions are limited to 8192 per side and 16 megapixels. Qt receives in-memory image bytes, never the player’s path. Remote URLs, pipes, devices, unsupported formats, and failed reads show the music-note fallback. Unavailable controls are dimmed.
 
 ## Update or disable
 
@@ -82,12 +82,14 @@ omarchy plugin enable omarchy.media
 
 ```bash
 omarchy plugin validate .
-qmllint MusicWidget.qml Playback.js Artwork.js
-node --test tests/artwork.test.js
-QT_QPA_PLATFORM=offscreen qmltestrunner -input tests
+node --test tests/*.test.js
+python -B -m unittest discover -s tests -v
+python -B tests/run_integration.py
 ```
 
-`MusicWidget.qml` implements the button and popup; `Playback.js` implements previous/restart. `Service.qml` and `MediaModel.js` are derived from [Omarchy's media plugin](https://github.com/basecamp/omarchy), preserving its source selection and playback integration. The `omarchy.clonedFrom` manifest field retains the required service compatibility.
+`Artwork.qml` and `artwork_loader.py` provide bounded local artwork loading without passing player paths to Qt’s image worker. `MusicWidget.qml` implements the button and popup; `Playback.js` implements previous/restart. `Service.qml` and `MediaModel.js` are derived from [Omarchy's media plugin](https://github.com/basecamp/omarchy), preserving its source selection and playback integration. The `omarchy.clonedFrom` manifest field retains the required service compatibility.
+
+The integration test requires a running Wayland session and installed Omarchy UI components. It uses a disposable Quickshell configuration and does not alter the installed plugin or desktop settings. English strings live in `i18n/en.json`; additional language catalogs can use the same keys.
 
 Plugin metadata and entry points are at the repository root so Omarchy's standard Git installer can validate and load the checkout directly.
 

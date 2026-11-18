@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "wfo.media",
   "name": "Music",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "wfo",
   "description": "A themed music button with album art and playback controls",
   "kinds": [

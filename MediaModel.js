@@ -112,6 +112,11 @@ function labelFor(player) {
   return player.trackTitle || player.identity || player.desktopEntry || ""
 }
 
+// Shared shell components may use AutoText on older supported Omarchy builds.
+function safeDisplayText(value) {
+  return String(value || "").slice(0, 4096).replace(/&/g, "＆").replace(/</g, "‹").replace(/>/g, "›")
+}
+
 function osdMessage(player, fallback) {
   if (!player) return fallback
   var label = labelFor(player)
@@ -137,6 +142,7 @@ if (typeof module !== "undefined") {
     trackSignature: trackSignature,
     trackChanged: trackChanged,
     labelFor: labelFor,
+    safeDisplayText: safeDisplayText,
     osdMessage: osdMessage
   }
 }

@@ -4,23 +4,29 @@ import qs.Ui
 import qs.Commons
 import qs.Commons as Commons
 import "Playback.js" as Playback
-import "Artwork.js" as Artwork
 
 Panel {
   id: root
   moduleName: "omarchy.media"
   ipcTarget: "wfo.music"
 
+  Commons.Translations { id: strings; directory: Qt.resolvedUrl("i18n") }
+
   // The cloned media service keeps Omarchy's player selection and hotkeys.
   readonly property var mediaService: bar?.shell?.firstPartyServiceFor("omarchy.media")
   readonly property var activePlayer: mediaService ? mediaService.activePlayer : null
   readonly property var sourcePlayers: mediaService ? mediaService.sourcePlayers : []
-  readonly property string title: activePlayer ? (activePlayer.trackTitle || "Unknown track") : "Nothing playing"
-  readonly property string artist: activePlayer ? (activePlayer.trackArtist || "Unknown artist") : "Start music in your player"
+  readonly property string title: activePlayer ? (activePlayer.trackTitle || strings.t("unknownTrack")) : strings.t("nothingPlaying")
+  readonly property string artist: activePlayer ? (activePlayer.trackArtist || strings.t("unknownArtist")) : strings.t("startMusic")
   readonly property color detailColor: Commons.Color.popups.text
 
   function previousOrRestart() {
     Playback.previousOrRestart(root.activePlayer)
+  }
+
+  Artwork {
+    id: artwork
+    url: root.activePlayer ? root.activePlayer.trackArtUrl : ""
   }
 
   implicitWidth: button.implicitWidth
@@ -31,7 +37,7 @@ Panel {
     anchors.fill: parent
     bar: root.bar
     text: "󰝚"
-    tooltipText: "Music"
+    tooltipText: strings.t("music")
     onPressed: function(mouseButton) {
       if (mouseButton === Qt.LeftButton) root.toggle()
     }
@@ -71,7 +77,10 @@ Panel {
             anchors.margins: Style.space(2)
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
-            source: Artwork.localSource(root.activePlayer ? root.activePlayer.trackArtUrl : "")
+            source: artwork.source
+            sourceSize.width: 256
+            sourceSize.height: 256
+            cache: false
             visible: status === Image.Ready
           }
 
@@ -132,8 +141,8 @@ Panel {
 
         Button {
           objectName: "previousButton"
-          iconText: "󰒮"
-          tooltipText: "Previous / restart"
+          iconText: Commons.I18n.rightToLeft ? "󰒭" : "󰒮"
+          tooltipText: strings.t("previous")
           focusable: true
           foreground: root.detailColor
           horizontalPadding: Style.spacing.controlPaddingX
@@ -146,7 +155,7 @@ Panel {
         Button {
           objectName: "playPauseButton"
           iconText: root.activePlayer && root.activePlayer.isPlaying ? "󰏤" : "󰐊"
-          tooltipText: root.activePlayer && root.activePlayer.isPlaying ? "Pause" : "Play"
+          tooltipText: root.activePlayer && root.activePlayer.isPlaying ? strings.t("pause") : strings.t("play")
           focusable: true
           foreground: root.detailColor
           horizontalPadding: Style.spacing.panelGap
@@ -159,8 +168,8 @@ Panel {
 
         Button {
           objectName: "nextButton"
-          iconText: "󰒭"
-          tooltipText: "Next track"
+          iconText: Commons.I18n.rightToLeft ? "󰒮" : "󰒭"
+          tooltipText: strings.t("next")
           focusable: true
           foreground: root.detailColor
           horizontalPadding: Style.spacing.controlPaddingX
@@ -192,7 +201,7 @@ Panel {
             readonly property var player: modelData
             readonly property bool selected: root.activePlayer && player
               && root.mediaService.playerKey(root.activePlayer) === root.mediaService.playerKey(player)
-            readonly property string sourceTitle: player ? (player.trackTitle || player.identity || player.desktopEntry || "Media source") : "Media source"
+            readonly property string sourceTitle: player ? (player.trackTitle || player.identity || player.desktopEntry || strings.t("mediaSource")) : strings.t("mediaSource")
             readonly property string sourceDetail: player && player.trackArtist ? player.trackArtist : (player && player.identity ? player.identity : "")
 
             width: sourceList.width
